@@ -5,6 +5,7 @@ import { authOptions } from "./auth"
 import { prisma } from "./prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { calculateGroupBalance } from "./calculations"
 
 export async function createGroup(formData: FormData) {
   const session = await getServerSession(authOptions)
@@ -193,7 +194,6 @@ export async function removeMemberFromGroup(groupId: string, userId: string) {
     })
 
     if (groupData) {
-      const { calculateGroupBalance } = await import("@/lib/calculations")
       const balance = calculateGroupBalance(
         userId,
         groupData.transactions,
