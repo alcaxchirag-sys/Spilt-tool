@@ -45,12 +45,22 @@ export default async function CreateTransactionPage({ params }: CreateTransactio
             redirect("/dashboard")
         }
 
+        // Prepare clean members data (no non-serializable Dates)
+        const membersData = group.members.map((m) => ({
+            userId: m.userId,
+            user: {
+                id: m.user.id,
+                username: m.user.username,
+                name: m.user.name,
+            },
+        }))
+
         return (
-            <div className="container max-w-4xl py-8 px-4">
+            <div className="max-w-2xl mx-auto py-8 px-4">
                 <AddExpenseForm
                     groupId={group.id}
                     groupName={group.name}
-                    members={group.members}
+                    members={membersData}
                 />
             </div>
         )
