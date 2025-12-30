@@ -63,19 +63,25 @@ export function calculateNetBalances(
     const receiver = settlement.receivedById
     const amount = settlement.amount
 
-    // Payer paid, so reduce what they're owed or increase what they owe
-    balances.set(payer, (balances.get(payer) || 0) - amount)
-    // Receiver received, so increase what they're owed or reduce what they owe
-    balances.set(receiver, (balances.get(receiver) || 0) + amount)
+    // Payer paid, so they are owed more (or owe less)
+    balances.set(payer, (balances.get(payer) || 0) + amount)
+    // Receiver received, so they are owed less (or owe more)
+    balances.set(receiver, (balances.get(receiver) || 0) - amount)
   })
 
-  // Convert to array
-  return users.map((user) => ({
-    userId: user.id,
-    username: user.username,
-    name: user.name,
-    balance: balances.get(user.id) || 0,
-  }))
+  // Convert to array and round to 2 decimal places to avoid floating point errors
+  return users.map((user) => {
+    const rawBalance = balances.get(user.id) || 0
+    // Use a small epsilon to treat near-zero balances as zero
+    const balance = Math.abs(rawBalance) < 0.001 ? 0 : parseFloat(rawBalance.toFixed(2))
+
+    return {
+      userId: user.id,
+      username: user.username,
+      name: user.name,
+      balance,
+    }
+  })
 }
 
 /**
@@ -85,10 +91,11 @@ export function calculateNetBalances(
 export function simplifyDebts(balances: UserBalance[]): SimplifiedDebt[] {
   // Separate creditors (positive balance) and debtors (negative balance)
   const creditors = balances
-    .filter((b) => b.balance > 0)
+    .filter((b) => b.balance > 0.001)
+    .map(b => ({ ...b })) // Clone to avoid modifying original
     .sort((a, b) => b.balance - a.balance)
   const debtors = balances
-    .filter((b) => b.balance < 0)
+    .filter((b) => b.balance < -0.001)
     .map((b) => ({ ...b, balance: Math.abs(b.balance) }))
     .sort((a, b) => b.balance - a.balance)
 
@@ -100,11 +107,11 @@ export function simplifyDebts(balances: UserBalance[]): SimplifiedDebt[] {
     const creditor = creditors[creditorIndex]
     const debtor = debtors[debtorIndex]
 
-    if (creditor.balance === 0) {
+    if (creditor.balance < 0.001) {
       creditorIndex++
       continue
     }
-    if (debtor.balance === 0) {
+    if (debtor.balance < 0.001) {
       debtorIndex++
       continue
     }
@@ -124,8 +131,8 @@ export function simplifyDebts(balances: UserBalance[]): SimplifiedDebt[] {
     creditor.balance -= amount
     debtor.balance -= amount
 
-    if (creditor.balance === 0) creditorIndex++
-    if (debtor.balance === 0) debtorIndex++
+    if (creditor.balance < 0.001) creditorIndex++
+    if (debtor.balance < 0.001) debtorIndex++
   }
 
   return simplified
@@ -167,13 +174,14 @@ export function calculateGroupBalance(
   // Process settlements
   settlements.forEach((settlement) => {
     if (settlement.paidById === userId) {
-      balance -= settlement.amount
+      balance += settlement.amount
     }
     if (settlement.receivedById === userId) {
-      balance += settlement.amount
+      balance -= settlement.amount
     }
   })
 
-  return parseFloat(balance.toFixed(2))
+  // Use epsilon check
+  return Math.abs(balance) < 0.001 ? 0 : parseFloat(balance.toFixed(2))
 }
 

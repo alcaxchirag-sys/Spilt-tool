@@ -38,6 +38,16 @@ export async function createTransaction(formData: FormData) {
     return { error: "You are not a member of this group" }
   }
 
+  // Check if group is closed
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { status: true },
+  })
+
+  if (group?.status === "CLOSED") {
+    return { error: "Cannot add transactions to a closed group" }
+  }
+
   try {
     // Get all group members
     const groupMembers = await prisma.groupMember.findMany({
@@ -65,13 +75,27 @@ export async function createTransaction(formData: FormData) {
     // Create splits
     if (splitType === "equal") {
       // Equal split
-      const splitAmount = amount / groupMembers.length
-      await prisma.transactionSplit.createMany({
-        data: groupMembers.map((member) => ({
+      const splitAmount = parseFloat((amount / groupMembers.length).toFixed(2))
+      const splits = groupMembers.map((member, index) => {
+        // For the last member, calculate the remainder to ensure total matches exactly
+        if (index === groupMembers.length - 1) {
+          const sumOfOthers = splitAmount * (groupMembers.length - 1)
+          const remainder = parseFloat((amount - sumOfOthers).toFixed(2))
+          return {
+            transactionId: transaction.id,
+            userId: member.userId,
+            amount: remainder,
+          }
+        }
+        return {
           transactionId: transaction.id,
           userId: member.userId,
-          amount: parseFloat(splitAmount.toFixed(2)),
-        })),
+          amount: splitAmount,
+        }
+      })
+
+      await prisma.transactionSplit.createMany({
+        data: splits,
       })
     } else if (splitType === "custom" && customSplits) {
       // Custom split
@@ -140,6 +164,11 @@ export async function updateTransaction(transactionId: string, formData: FormDat
     return { error: "You don't have permission to edit this transaction" }
   }
 
+  // Check if group is closed
+  if (transaction.group.status === "CLOSED") {
+    return { error: "Cannot edit transactions in a closed group" }
+  }
+
   try {
     // Update transaction
     await prisma.transaction.update({
@@ -160,13 +189,26 @@ export async function updateTransaction(transactionId: string, formData: FormDat
     // Create new splits
     if (splitType === "equal") {
       const groupMembers = transaction.group.members
-      const splitAmount = amount / groupMembers.length
-      await prisma.transactionSplit.createMany({
-        data: groupMembers.map((member) => ({
+      const splitAmount = parseFloat((amount / groupMembers.length).toFixed(2))
+      const splits = groupMembers.map((member, index) => {
+        if (index === groupMembers.length - 1) {
+          const sumOfOthers = splitAmount * (groupMembers.length - 1)
+          const remainder = parseFloat((amount - sumOfOthers).toFixed(2))
+          return {
+            transactionId,
+            userId: member.userId,
+            amount: remainder,
+          }
+        }
+        return {
           transactionId,
           userId: member.userId,
-          amount: parseFloat(splitAmount.toFixed(2)),
-        })),
+          amount: splitAmount,
+        }
+      })
+
+      await prisma.transactionSplit.createMany({
+        data: splits,
       })
     } else if (splitType === "custom" && customSplits) {
       const splits = JSON.parse(customSplits)
@@ -223,6 +265,11 @@ export async function deleteTransaction(transactionId: string) {
 
   if (!isCreator && !isAdmin) {
     return { error: "You don't have permission to delete this transaction" }
+  }
+
+  // Check if group is closed
+  if (transaction.group.status === "CLOSED") {
+    return { error: "Cannot delete transactions from a closed group" }
   }
 
   try {

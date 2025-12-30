@@ -94,6 +94,16 @@ export async function addMemberToGroup(groupId: string, username: string) {
     return { error: "Only group admins can add members" }
   }
 
+  // Check if group is closed
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { status: true },
+  })
+
+  if (group?.status === "CLOSED") {
+    return { error: "Cannot add members to a closed group" }
+  }
+
   try {
     const user = await prisma.user.findUnique({
       where: { username },
@@ -153,12 +163,48 @@ export async function removeMemberFromGroup(groupId: string, userId: string) {
     return { error: "Only group admins can remove members" }
   }
 
+  // Check if group is closed
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { status: true },
+  })
+
+  if (group?.status === "CLOSED") {
+    return { error: "Cannot remove members from a closed group" }
+  }
+
   // Don't allow removing yourself
   if (userId === session.user.id) {
     return { error: "Cannot remove yourself from group" }
   }
 
+  // Check if user has a non-zero balance
   try {
+    const groupData = await prisma.group.findUnique({
+      where: { id: groupId },
+      include: {
+        transactions: {
+          include: {
+            splits: true,
+          },
+        },
+        settlements: true,
+      },
+    })
+
+    if (groupData) {
+      const { calculateGroupBalance } = await import("@/lib/calculations")
+      const balance = calculateGroupBalance(
+        userId,
+        groupData.transactions,
+        groupData.settlements
+      )
+
+      if (Math.abs(balance) > 0.01) {
+        return { error: "Cannot remove member with a non-zero balance. Please settle up first." }
+      }
+    }
+
     await prisma.groupMember.delete({
       where: {
         groupId_userId: {
@@ -194,6 +240,16 @@ export async function updateGroup(groupId: string, formData: FormData) {
 
   if (!membership || membership.role !== "ADMIN") {
     return { error: "Only group admins can edit group details" }
+  }
+
+  // Check if group is closed
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { status: true },
+  })
+
+  if (group?.status === "CLOSED") {
+    return { error: "Cannot edit a closed group" }
   }
 
   const name = formData.get("name") as string

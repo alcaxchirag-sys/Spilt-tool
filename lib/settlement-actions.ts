@@ -35,6 +35,16 @@ export async function createSettlement(formData: FormData) {
     return { error: "You are not a member of this group" }
   }
 
+  // Check if group is closed
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { status: true },
+  })
+
+  if (group?.status === "CLOSED") {
+    return { error: "Cannot add settlements to a closed group" }
+  }
+
   // Verify receiver is a member
   const receiverMembership = await prisma.groupMember.findUnique({
     where: {
@@ -103,6 +113,11 @@ export async function deleteSettlement(settlementId: string) {
 
   if (!isPayer && !isReceiver && !isAdmin) {
     return { error: "You don't have permission to delete this settlement" }
+  }
+
+  // Check if group is closed
+  if (settlement.group.status === "CLOSED") {
+    return { error: "Cannot delete settlements from a closed group" }
   }
 
   try {
