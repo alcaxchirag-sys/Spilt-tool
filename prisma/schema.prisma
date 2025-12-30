@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdGroups     Group[]         @relation("GroupCreator")
+  groupMemberships  GroupMember[]
+  createdTransactions Transaction[]  @relation("TransactionCreator")
+  paidTransactions  Transaction[]    @relation("TransactionPayer")
+  transactionSplits TransactionSplit[]
+  settlementsPaid   Settlement[]    @relation("SettlementPayer")
+  settlementsReceived Settlement[]  @relation("SettlementReceiver")
+
+  @@index([username])
+  @@map("users")
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator   User          @relation("GroupCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  members   GroupMember[]
+  transactions Transaction[]
+  settlements  Settlement[]
+
+  @@index([createdById])
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+  @@map("group_members")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  groupId     String
+  createdById String
+  paidById    String
+  title       String
+  amount      Float
+  category    String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  group   Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  creator User             @relation("TransactionCreator", fields: [createdById], references: [id])
+  payer   User             @relation("TransactionPayer", fields: [paidById], references: [id])
+  splits  TransactionSplit[]
+
+  @@index([groupId])
+  @@index([createdById])
+  @@index([paidById])
+  @@map("transactions")
+}
+
+model TransactionSplit {
+  id            String   @id @default(cuid())
+  transactionId String
+  userId        String
+  amount        Float
+  percentage    Float?
+
+  // Relations
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionId, userId])
+  @@index([transactionId])
+  @@index([userId])
+  @@map("transaction_splits")
+}
+
+model Settlement {
+  id           String   @id @default(cuid())
+  groupId      String
+  paidById     String
+  receivedById String
+  amount       Float
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  group    Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  payer    User  @relation("SettlementPayer", fields: [paidById], references: [id])
+  receiver User  @relation("SettlementReceiver", fields: [receivedById], references: [id])
+
+  @@index([groupId])
+  @@index([paidById])
+  @@index([receivedById])
+  @@map("settlements")
+}
+
