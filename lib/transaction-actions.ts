@@ -69,10 +69,11 @@ export async function createTransaction(formData: FormData) {
         amount,
         category: category?.trim() || null,
         notes: notes?.trim() || null,
+        splitType: splitType === "custom" ? "CUSTOM" : "EQUAL",
       },
     })
 
-    // Create splits
+    // Create splits (even for EQUAL, we store them as a snapshot of current members)
     if (splitType === "equal") {
       // Equal split
       const splitAmount = parseFloat((amount / groupMembers.length).toFixed(2))
@@ -178,6 +179,7 @@ export async function updateTransaction(transactionId: string, formData: FormDat
         amount,
         category: category?.trim() || null,
         notes: notes?.trim() || null,
+        splitType: splitType === "custom" ? "CUSTOM" : "EQUAL",
       },
     })
 

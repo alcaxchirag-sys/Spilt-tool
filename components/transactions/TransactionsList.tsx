@@ -17,6 +17,7 @@ interface Transaction {
   amount: number
   category: string | null
   notes: string | null
+  splitType: "EQUAL" | "CUSTOM"
   createdAt: Date
   paidById: string
   payer: {
@@ -214,6 +215,7 @@ export default function TransactionsList({
       {selectedTransaction && (
         <TransactionDetailModal
           transaction={selectedTransaction}
+          members={members}
           onClose={() => setSelectedTransaction(null)}
         />
       )}

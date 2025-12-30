@@ -72,6 +72,11 @@ model GroupMember {
   @@map("group_members")
 }
 
+enum SplitType {
+  EQUAL
+  CUSTOM
+}
+
 model Transaction {
   id          String   @id @default(cuid())
   groupId     String
@@ -81,6 +86,7 @@ model Transaction {
   amount      Float
   category    String?
   notes       String?
+  splitType   SplitType @default(EQUAL)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

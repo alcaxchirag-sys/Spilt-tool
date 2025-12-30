@@ -48,6 +48,10 @@ export default function MembersList({
         toast.error(result.error)
       } else {
         toast.success("Member added successfully!")
+        toast("Expenses rebalanced due to new member joining", {
+          icon: "🔄",
+          duration: 4000,
+        })
         setUsername("")
         setAddingMember(false)
         router.refresh()

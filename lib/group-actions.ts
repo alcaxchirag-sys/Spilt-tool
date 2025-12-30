@@ -190,6 +190,7 @@ export async function removeMemberFromGroup(groupId: string, userId: string) {
           },
         },
         settlements: true,
+        members: true,
       },
     })
 
@@ -197,7 +198,8 @@ export async function removeMemberFromGroup(groupId: string, userId: string) {
       const balance = calculateGroupBalance(
         userId,
         groupData.transactions,
-        groupData.settlements
+        groupData.settlements,
+        groupData.members.length
       )
 
       if (Math.abs(balance) > 0.01) {

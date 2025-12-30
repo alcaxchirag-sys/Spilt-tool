@@ -24,6 +24,7 @@ interface Transaction {
   amount: number
   category: string | null
   notes: string | null
+  splitType: "EQUAL" | "CUSTOM"
   splits: Array<{
     userId: string
     amount: number

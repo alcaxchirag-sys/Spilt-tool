@@ -10,6 +10,7 @@ interface Transaction {
   amount: number
   category: string | null
   notes: string | null
+  splitType: "EQUAL" | "CUSTOM"
   createdAt: Date
   payer: {
     id: string
@@ -29,13 +30,31 @@ interface Transaction {
 
 interface TransactionDetailModalProps {
   transaction: Transaction
+  members: Array<{
+    userId: string
+    user: {
+      id: string
+      username: string
+      name: string
+    }
+  }>
   onClose: () => void
 }
 
 export default function TransactionDetailModal({
   transaction,
+  members,
   onClose,
 }: TransactionDetailModalProps) {
+  const isEqualSplit = transaction.splitType === "EQUAL"
+  const displaySplits = isEqualSplit
+    ? members.map((m) => ({
+      userId: m.userId,
+      amount: transaction.amount / members.length,
+      user: m.user,
+    }))
+    : transaction.splits
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-sm">
@@ -60,11 +79,16 @@ export default function TransactionDetailModal({
           <div className="flex-1 overflow-y-auto overscroll-contain p-6 space-y-6">
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{transaction.title}</h3>
-              {transaction.category && (
-                <span className="inline-block px-3 py-1 text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
-                  {transaction.category}
+              <div className="flex flex-wrap gap-2">
+                {transaction.category && (
+                  <span className="inline-block px-3 py-1 text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
+                    {transaction.category}
+                  </span>
+                )}
+                <span className="inline-block px-3 py-1 text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+                  {isEqualSplit ? "Split Equally" : "Custom Split"}
                 </span>
-              )}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -111,9 +135,16 @@ export default function TransactionDetailModal({
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Split Details</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-gray-900 dark:text-white">Split Details</h4>
+                {isEqualSplit && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    (Rebalanced for {members.length} members)
+                  </span>
+                )}
+              </div>
               <div className="space-y-2">
-                {transaction.splits.map((split) => (
+                {displaySplits.map((split) => (
                   <div
                     key={split.userId}
                     className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"

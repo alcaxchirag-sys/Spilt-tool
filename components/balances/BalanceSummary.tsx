@@ -9,6 +9,7 @@ interface BalanceSummaryProps {
   transactions: Array<{
     paidById: string
     amount: number
+    splitType?: "EQUAL" | "CUSTOM"
     splits: Array<{
       userId: string
       amount: number
@@ -45,38 +46,35 @@ export default function BalanceSummary({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`gradient-card rounded-xl p-6 shadow-lg border ${
-            currentUserBalance.balance > 0
+          className={`gradient-card rounded-xl p-6 shadow-lg border ${currentUserBalance.balance > 0
               ? "border-green-200 bg-gradient-to-br from-green-50 to-white"
               : currentUserBalance.balance < 0
-              ? "border-red-200 bg-gradient-to-br from-red-50 to-white"
-              : "border-purple-100"
-          }`}
+                ? "border-red-200 bg-gradient-to-br from-red-50 to-white"
+                : "border-purple-100"
+            }`}
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Your Balance</p>
               <p
-                className={`text-3xl font-bold ${
-                  currentUserBalance.balance > 0
+                className={`text-3xl font-bold ${currentUserBalance.balance > 0
                     ? "text-green-600"
                     : currentUserBalance.balance < 0
-                    ? "text-red-600"
-                    : "text-gray-900"
-                }`}
+                      ? "text-red-600"
+                      : "text-gray-900"
+                  }`}
               >
                 {currentUserBalance.balance > 0
                   ? `You are owed $${Math.abs(currentUserBalance.balance).toFixed(2)}`
                   : currentUserBalance.balance < 0
-                  ? `You owe $${Math.abs(currentUserBalance.balance).toFixed(2)}`
-                  : "Settled up"}
+                    ? `You owe $${Math.abs(currentUserBalance.balance).toFixed(2)}`
+                    : "Settled up"}
               </p>
             </div>
             {currentUserBalance.balance !== 0 && (
               <div
-                className={`p-4 rounded-lg ${
-                  currentUserBalance.balance > 0 ? "bg-green-100" : "bg-red-100"
-                }`}
+                className={`p-4 rounded-lg ${currentUserBalance.balance > 0 ? "bg-green-100" : "bg-red-100"
+                  }`}
               >
                 {currentUserBalance.balance > 0 ? (
                   <TrendingUp className="text-green-600" size={32} />
@@ -168,19 +166,18 @@ export default function BalanceSummary({
                 <span className="font-medium text-gray-900">{balance.name}</span>
               </div>
               <span
-                className={`font-semibold ${
-                  balance.balance > 0
+                className={`font-semibold ${balance.balance > 0
                     ? "text-green-600"
                     : balance.balance < 0
-                    ? "text-red-600"
-                    : "text-gray-600"
-                }`}
+                      ? "text-red-600"
+                      : "text-gray-600"
+                  }`}
               >
                 {balance.balance > 0
                   ? `+$${balance.balance.toFixed(2)}`
                   : balance.balance < 0
-                  ? `-$${Math.abs(balance.balance).toFixed(2)}`
-                  : "$0.00"}
+                    ? `-$${Math.abs(balance.balance).toFixed(2)}`
+                    : "$0.00"}
               </span>
             </motion.div>
           ))}

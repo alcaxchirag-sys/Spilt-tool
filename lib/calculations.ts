@@ -24,6 +24,7 @@ export function calculateNetBalances(
   transactions: Array<{
     paidById: string
     amount: number
+    splitType?: "EQUAL" | "CUSTOM"
     splits: Array<{
       userId: string
       amount: number
@@ -47,14 +48,24 @@ export function calculateNetBalances(
   transactions.forEach((transaction) => {
     const paidBy = transaction.paidById
     const totalAmount = transaction.amount
+    const splitType = transaction.splitType || "EQUAL"
 
     // Add to payer's balance (they paid, so they're owed)
     balances.set(paidBy, (balances.get(paidBy) || 0) + totalAmount)
 
     // Subtract from each person who owes
-    transaction.splits.forEach((split) => {
-      balances.set(split.userId, (balances.get(split.userId) || 0) - split.amount)
-    })
+    if (splitType === "EQUAL") {
+      // Dynamic equal split among ALL current users
+      const share = totalAmount / users.length
+      users.forEach((user) => {
+        balances.set(user.id, (balances.get(user.id) || 0) - share)
+      })
+    } else {
+      // Custom split based on stored records
+      transaction.splits.forEach((split) => {
+        balances.set(split.userId, (balances.get(split.userId) || 0) - split.amount)
+      })
+    }
   })
 
   // Process settlements (reduce balances)
@@ -146,6 +157,7 @@ export function calculateGroupBalance(
   transactions: Array<{
     paidById: string
     amount: number
+    splitType?: "EQUAL" | "CUSTOM"
     splits: Array<{
       userId: string
       amount: number
@@ -155,19 +167,28 @@ export function calculateGroupBalance(
     paidById: string
     receivedById: string
     amount: number
-  }>
+  }>,
+  currentMemberCount: number // Added to handle dynamic equal splits
 ): number {
   let balance = 0
 
   // Process transactions
   transactions.forEach((transaction) => {
+    const splitType = transaction.splitType || "EQUAL"
+
     if (transaction.paidById === userId) {
       balance += transaction.amount
     }
 
-    const userSplit = transaction.splits.find((s) => s.userId === userId)
-    if (userSplit) {
-      balance -= userSplit.amount
+    if (splitType === "EQUAL") {
+      // Dynamic equal split
+      balance -= transaction.amount / currentMemberCount
+    } else {
+      // Custom split
+      const userSplit = transaction.splits.find((s) => s.userId === userId)
+      if (userSplit) {
+        balance -= userSplit.amount
+      }
     }
   })
 
