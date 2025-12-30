@@ -52,7 +52,7 @@ export function DashboardContent({ userName, groups }: DashboardContentProps) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100"
+          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -71,7 +71,7 @@ export function DashboardContent({ userName, groups }: DashboardContentProps) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100"
+          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -90,7 +90,7 @@ export function DashboardContent({ userName, groups }: DashboardContentProps) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100"
+          className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
         >
           <div className="flex items-center justify-between">
             <div>

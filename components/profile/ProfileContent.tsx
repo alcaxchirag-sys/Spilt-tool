@@ -83,7 +83,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
         transition={{ delay: 0.2 }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
-        <div className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100">
+        <div className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">
@@ -99,7 +99,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
           </div>
         </div>
 
-        <div className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100">
+        <div className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Total Groups</p>

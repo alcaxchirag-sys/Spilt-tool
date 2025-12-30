@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import toast from "react-hot-toast"
 import { createGroup } from "@/lib/group-actions"
+import LoadingButton from "@/components/ui/LoadingButton"
 
 export default function CreateGroupPage() {
   const router = useRouter()
@@ -100,13 +101,14 @@ export default function CreateGroupPage() {
           </div>
 
           <div className="flex space-x-4">
-            <button
+            <LoadingButton
               type="submit"
-              disabled={loading}
-              className="flex-1 gradient-button text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              isLoading={loading}
+              loadingText="Creating..."
+              className="flex-1 py-3"
             >
-              {loading ? "Creating..." : "Create Group"}
-            </button>
+              Create Group
+            </LoadingButton>
             <button
               type="button"
               onClick={() => router.back()}
