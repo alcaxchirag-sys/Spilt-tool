@@ -7,6 +7,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import toast from "react-hot-toast"
 
+import Logo from "@/components/ui/Logo"
+
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -29,7 +31,7 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error("Invalid username or password")
       } else {
-        toast.success("Logged in successfully!")
+        toast.success("Welcome back!")
         router.push("/dashboard")
         router.refresh()
       }
@@ -41,24 +43,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-950">
+      {/* Premium Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-violet-600/20 blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px]" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-md relative z-10"
       >
-        <div className="glass-effect rounded-2xl shadow-2xl p-8 border border-purple-100">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-              SplitItUp
-            </h1>
-            <p className="text-gray-600">Sign in to your account</p>
+        <div className="glass-effect rounded-[2rem] shadow-2xl p-8 sm:p-12 border border-white/10">
+          <div className="flex flex-col items-center text-center mb-10">
+            <Logo size="xl" className="mb-6" />
+            <h2 className="text-xl font-medium text-slate-300">Welcome back</h2>
+            <p className="text-slate-500 text-sm mt-1">Sign in to manage your group expenses</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label htmlFor="username" className="block text-sm font-medium text-slate-400 ml-1">
                 Username
               </label>
               <input
@@ -67,13 +72,13 @@ export default function LoginPage() {
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 outline-none transition-all"
                 placeholder="Enter your username"
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-400 ml-1">
                 Password
               </label>
               <input
@@ -82,7 +87,7 @@ export default function LoginPage() {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 outline-none transition-all"
                 placeholder="Enter your password"
               />
             </div>
@@ -90,17 +95,17 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full gradient-button text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full gradient-button text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-violet-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Authenticating..." : "Sign In"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
+          <div className="mt-8 text-center">
+            <p className="text-slate-500 text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-purple-600 hover:text-purple-700 font-semibold">
-                Sign up
+              <Link href="/signup" className="text-violet-400 hover:text-violet-300 font-bold transition-colors">
+                Create one
               </Link>
             </p>
           </div>

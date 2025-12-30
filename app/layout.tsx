@@ -8,8 +8,8 @@ import BottomNav from "@/components/layout/BottomNav"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SplitItUp Expense App",
-  description: "Split expenses with friends and groups",
+  title: "SplitItUp | Smart Expense Splitting",
+  description: "The premium way to split expenses with friends and groups.",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>",
   },

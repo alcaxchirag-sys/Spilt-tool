@@ -21,7 +21,7 @@ export default function BottomNav() {
     }
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 pb-safe">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 pb-safe">
             <div className="flex justify-around items-center h-16 px-2">
                 {navItems.map((item) => {
                     const Icon = item.icon
@@ -36,18 +36,18 @@ export default function BottomNav() {
                             {isActive && (
                                 <motion.div
                                     layoutId="bottomNavIndicator"
-                                    className="absolute -top-[1px] w-12 h-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-b-full"
+                                    className="absolute -top-[1px] w-12 h-1 bg-gradient-to-r from-violet-600 to-blue-600 rounded-b-full shadow-[0_2px_10px_rgba(124,58,237,0.3)]"
                                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                 />
                             )}
                             <div
-                                className={`transition-colors duration-200 ${isActive ? "text-purple-600 dark:text-purple-400" : "text-gray-500 dark:text-gray-400"
+                                className={`transition-all duration-300 ${isActive ? "text-violet-600 dark:text-violet-400 scale-110" : "text-slate-400 dark:text-slate-500"
                                     }`}
                             >
                                 <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
                             <span
-                                className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? "text-purple-600 dark:text-purple-400" : "text-gray-500 dark:text-gray-400"
+                                className={`text-[10px] font-bold transition-colors duration-300 ${isActive ? "text-violet-600 dark:text-violet-400" : "text-slate-400 dark:text-slate-500"
                                     }`}
                             >
                                 {item.label}

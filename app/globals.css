@@ -11,6 +11,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 262.1 83.3% 57.8%;
+    /* Violet */
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -23,7 +24,8 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 262.1 83.3% 57.8%;
-    --radius: 0.5rem;
+    --radius: 1rem;
+    /* 16px */
   }
 
   .dark {
@@ -53,27 +55,27 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-foreground;
+    @apply bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-foreground;
     min-height: 100vh;
   }
 }
 
 @layer utilities {
   .gradient-card {
-    @apply bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20;
+    @apply bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10;
   }
-  
+
   .gradient-button {
-    @apply bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700;
+    @apply bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700;
   }
-  
+
   .glass-effect {
-    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-md;
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-800/20;
   }
-  
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
-
