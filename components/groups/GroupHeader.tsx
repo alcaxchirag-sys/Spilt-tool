@@ -13,6 +13,7 @@ interface GroupHeaderProps {
     id: string
     name: string
     description: string | null
+    status?: string
   }
   isAdmin: boolean
   totalExpenses: number
@@ -98,12 +99,19 @@ export default function GroupHeader({
         <div>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{group.name}</h1>
+              <div className="flex items-center space-x-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">{group.name}</h1>
+                {group.status === "CLOSED" && (
+                  <span className="px-3 py-1 text-sm font-bold bg-gray-100 text-gray-600 rounded-full border border-gray-200">
+                    CLOSED
+                  </span>
+                )}
+              </div>
               {group.description && (
                 <p className="text-gray-600">{group.description}</p>
               )}
             </div>
-            {isAdmin && (
+            {isAdmin && group.status !== "CLOSED" && (
               <button
                 onClick={() => setIsEditing(true)}
                 className="p-2 rounded-lg text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-all"

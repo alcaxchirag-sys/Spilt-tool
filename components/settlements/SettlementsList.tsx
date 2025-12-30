@@ -42,6 +42,7 @@ interface SettlementsListProps {
   }>
   currentUserId: string
   isAdmin: boolean
+  isGroupClosed: boolean
 }
 
 export default function SettlementsList({
@@ -50,6 +51,7 @@ export default function SettlementsList({
   members,
   currentUserId,
   isAdmin,
+  isGroupClosed,
 }: SettlementsListProps) {
   const router = useRouter()
   const [showAddModal, setShowAddModal] = useState(false)
@@ -72,6 +74,7 @@ export default function SettlementsList({
   }
 
   const canDelete = (settlement: Settlement) => {
+    if (isGroupClosed) return false
     return (
       settlement.paidById === currentUserId ||
       settlement.receivedById === currentUserId ||
@@ -83,25 +86,29 @@ export default function SettlementsList({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Settlements</h2>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="gradient-button text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
-        >
-          <Plus size={20} />
-          <span>Record Payment</span>
-        </button>
+        {!isGroupClosed && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="gradient-button text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
+          >
+            <Plus size={20} />
+            <span>Record Payment</span>
+          </button>
+        )}
       </div>
 
       {settlements.length === 0 ? (
         <div className="gradient-card rounded-xl p-12 text-center border border-purple-100">
           <ArrowRight className="mx-auto text-gray-400 mb-4" size={48} />
           <p className="text-gray-600 mb-4">No settlements recorded yet</p>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="gradient-button text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Record Your First Payment
-          </button>
+          {!isGroupClosed && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="gradient-button text-white px-6 py-3 rounded-lg font-semibold"
+            >
+              Record Your First Payment
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

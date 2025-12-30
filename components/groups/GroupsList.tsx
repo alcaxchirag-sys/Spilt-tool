@@ -5,10 +5,16 @@ import { motion } from "framer-motion"
 import { Users, DollarSign, Clock } from "lucide-react"
 import { format } from "date-fns"
 
+import { closeGroup } from "@/lib/group-actions"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
+
 interface Group {
   id: string
   name: string
   description: string | null
+  createdById?: string
+  status?: string
   _count: {
     transactions: number
     members: number
@@ -24,6 +30,25 @@ interface GroupsListProps {
 }
 
 export default function GroupsList({ groups, currentUserId }: GroupsListProps) {
+  const router = useRouter()
+
+  const handleCloseGroup = async (e: React.MouseEvent, groupId: string) => {
+    e.preventDefault() // Prevent navigation
+    e.stopPropagation()
+
+    if (!confirm("Are you sure you want to close this group? This action cannot be undone.")) {
+      return
+    }
+
+    const result = await closeGroup(groupId)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Group closed successfully")
+      router.refresh()
+    }
+  }
+
   if (groups.length === 0) {
     return (
       <div className="text-center py-12 gradient-card rounded-xl border border-purple-100">
@@ -41,9 +66,17 @@ export default function GroupsList({ groups, currentUserId }: GroupsListProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:border-purple-300 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer h-full"
+            className="gradient-card rounded-xl p-6 shadow-lg border border-purple-100 hover:border-purple-300 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer h-full relative group"
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{group.name}</h3>
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-xl font-bold text-gray-900">{group.name}</h3>
+              {group.status === "CLOSED" && (
+                <span className="px-2 py-1 text-xs font-bold bg-gray-100 text-gray-600 rounded-full">
+                  CLOSED
+                </span>
+              )}
+            </div>
+
             {group.description && (
               <p className="text-sm text-gray-600 mb-4 line-clamp-2">{group.description}</p>
             )}
@@ -69,6 +102,18 @@ export default function GroupsList({ groups, currentUserId }: GroupsListProps) {
                 </div>
               )}
             </div>
+
+            {/* Admin Actions */}
+            {group.createdById === currentUserId && group.status !== "CLOSED" && (
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={(e) => handleCloseGroup(e, group.id)}
+                  className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-full border border-red-200 transition-colors"
+                >
+                  Close Group
+                </button>
+              </div>
+            )}
           </motion.div>
         </Link>
       ))}

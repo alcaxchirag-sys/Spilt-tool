@@ -11,6 +11,7 @@ type SimpleGroup = {
   name: string
   description: string | null
   createdById?: string
+  status?: string
   _count: {
     transactions: number
     members: number

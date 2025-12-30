@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Edit2, Trash2, DollarSign } from "lucide-react"
 import { format } from "date-fns"
@@ -56,6 +57,7 @@ interface TransactionsListProps {
   members: Member[]
   currentUserId: string
   isAdmin: boolean
+  isGroupClosed: boolean
 }
 
 export default function TransactionsList({
@@ -64,6 +66,7 @@ export default function TransactionsList({
   members,
   currentUserId,
   isAdmin,
+  isGroupClosed,
 }: TransactionsListProps) {
   const router = useRouter()
   const [showAddModal, setShowAddModal] = useState(false)
@@ -99,6 +102,7 @@ export default function TransactionsList({
   }
 
   const canEdit = (transaction: Transaction) => {
+    if (isGroupClosed) return false
     return transaction.createdById === currentUserId || isAdmin
   }
 
@@ -106,25 +110,29 @@ export default function TransactionsList({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Transactions</h2>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="gradient-button text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
-        >
-          <Plus size={20} />
-          <span>Add Expense</span>
-        </button>
+        {!isGroupClosed && (
+          <Link
+            href={`/groups/${groupId}/transactions/create`}
+            className="gradient-button text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
+          >
+            <Plus size={20} />
+            <span>Add Expense</span>
+          </Link>
+        )}
       </div>
 
       {optimisticTransactions.length === 0 ? (
         <div className="gradient-card rounded-xl p-12 text-center border border-purple-100">
           <DollarSign className="mx-auto text-gray-400 mb-4" size={48} />
           <p className="text-gray-600 mb-4">No transactions yet</p>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="gradient-button text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Add Your First Expense
-          </button>
+          {!isGroupClosed && (
+            <Link
+              href={`/groups/${groupId}/transactions/create`}
+              className="gradient-button text-white px-6 py-3 rounded-lg font-semibold inline-block"
+            >
+              Add Your First Expense
+            </Link>
+          )}
         </div>
       ) : (
         <motion.div layout className="space-y-4">

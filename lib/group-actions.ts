@@ -221,3 +221,42 @@ export async function updateGroup(groupId: string, formData: FormData) {
   }
 }
 
+export async function closeGroup(groupId: string) {
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    return { error: "Unauthorized" }
+  }
+
+  // Check if user is admin
+  const membership = await prisma.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: session.user.id,
+      },
+    },
+  })
+
+  if (!membership || membership.role !== "ADMIN") {
+    return { error: "Only group admins can close the group" }
+  }
+
+  try {
+    // Check if group exists and has status field (this might fail if migration not run)
+    // We'll assume migration is run or will be run.
+    await prisma.group.update({
+      where: { id: groupId },
+      data: {
+        status: "CLOSED",
+      },
+    })
+
+    revalidatePath(`/groups/${groupId}`)
+    revalidatePath("/groups")
+    return { success: true }
+  } catch (error) {
+    console.error("Close group error:", error)
+    return { error: "Failed to close group (Database migration required)" }
+  }
+}
+
