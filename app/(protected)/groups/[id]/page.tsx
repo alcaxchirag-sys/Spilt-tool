@@ -9,7 +9,6 @@ import MembersList from "@/components/groups/MembersList"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Receipt, Users, DollarSign, CreditCard } from "lucide-react"
 import SettlementsList from "@/components/settlements/SettlementsList"
-import { motion } from "framer-motion"
 
 export default async function GroupDetailPage({
   params,
@@ -123,22 +122,6 @@ export default async function GroupDetailPage({
         totalExpenses={totalExpenses}
         memberCount={group.members.length}
       />
-
-      {group.status === "CLOSED" && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center space-x-3 text-gray-600 dark:text-gray-400"
-        >
-          <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-            <CreditCard size={20} />
-          </div>
-          <div>
-            <p className="font-semibold">This group is closed</p>
-            <p className="text-sm">No further expenses or settlements can be added.</p>
-          </div>
-        </motion.div>
-      )}
 
       <Tabs defaultValue="transactions" className="w-full">
         <TabsList className="grid w-full max-w-3xl grid-cols-4">
