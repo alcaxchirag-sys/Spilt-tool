@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard,
   Users,
@@ -36,8 +36,8 @@ export default function Navbar() {
     <nav className="glass-effect border-b border-purple-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <Link href="/dashboard" className="flex items-center space-x-2 group">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-200">
               SplitItUp
             </span>
           </Link>
@@ -52,8 +52,8 @@ export default function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                      : "text-gray-700 hover:bg-purple-50"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                    : "text-gray-700 hover:bg-purple-50"
                     }`}
                 >
                   <Icon size={18} />
@@ -80,40 +80,43 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden pb-4 space-y-2"
-          >
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${isActive
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden pb-4 space-y-2 overflow-hidden"
+            >
+              {navItems.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${isActive
                       ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
                       : "text-gray-700 hover:bg-purple-50"
-                    }`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              )
-            })}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
-            >
-              <LogOut size={20} />
-              <span className="font-medium">Logout</span>
-            </button>
-          </motion.div>
-        )}
+                      }`}
+                  >
+                    <Icon size={20} />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                )
+              })}
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
+              >
+                <LogOut size={20} />
+                <span className="font-medium">Logout</span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   )
